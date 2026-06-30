@@ -203,6 +203,7 @@ def create_tickets():
         name = request.form['name']
         email = request.form['email']
         problem_desc = request.form['problem_desc']
+        priority = request.form['priority']  # BUG: this field doesn't exist in the HTML form!
 
         if len(problem_desc) > 255:
             flash("Problem description is too long (max 255 characters).", "danger")
