@@ -9,21 +9,23 @@ import MySQLdb
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
+load_dotenv()
+import os 
 
-SMTP_SERVER = 'smtp.gmail.com'     # or your SMTP server
-SMTP_PORT = 587
-SMTP_EMAIL = 'nikhilsaieshwar38@gmail.com'
-SMTP_PASSWORD = 'otkqjvbceksimmru'   # Use App Password if using Gmail
+SMTP_SERVER = os.getenv('SMTP_SERVER')
+SMTP_PORT = int(os.getenv('SMTP_PORT'))
+SMTP_EMAIL = os.getenv('SMTP_EMAIL')
+SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
 
 app = Flask(__name__)
 
 # MySQL Configuration
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '1234'
-app.config['MYSQL_DB'] = 'ticketmanagement'
-app.secret_key = 'your_secret_key_here'
-
+app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
+app.secret_key = os.getenv('SECRET_KEY')
 mysql = MySQL(app)
 
 class LoginForm(FlaskForm):
