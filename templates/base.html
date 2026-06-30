@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Dashboard{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex h-screen">
+
+  {% if not hide_sidebar %}
+  <!-- Sidebar -->
+  <aside class="w-64 bg-gray-800 text-white flex flex-col p-4">
+    <h2 class="text-2xl font-bold mb-6">Ticket Management App</h2>
+    <nav class="flex flex-col space-y-2">
+      <a href="{{ url_for('dashboard') }}" class="hover:bg-gray-700 p-2 rounded">Dashboard</a>
+      <a href="{{ url_for('usermaster') }}" class="hover:bg-gray-700 p-2 rounded">User Master</a>
+      <a href="{{ url_for('create_tickets') }}" class="hover:bg-gray-700 p-2 rounded">Create Tickets</a>
+      <a href="{{ url_for('ticket_lists') }}" class="hover:bg-gray-700 p-2 rounded">All Tickets</a>
+      <a href="{{ url_for('productmaster') }}" class="hover:bg-gray-700 p-2 rounded">Product Master</a>
+      <a href="{{ url_for('logout') }}" class="mt-auto hover:bg-red-600 p-2 rounded">Logout</a>
+
+    </nav>
+  </aside>
+  {% endif %}
+
+  <!-- Main Content -->
+  <main class="flex-1 p-8">
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+</html>
