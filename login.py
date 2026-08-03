@@ -11,6 +11,7 @@ from wtforms.validators import DataRequired, Email, ValidationError
 from flask_mysqldb import MySQL
 import MySQLdb
 import bcrypt
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -20,11 +21,20 @@ app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
 app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
 mysql = MySQL(app)
+bcrypt = Bcrypt(app)
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Login")
+
+    def validate_password(self, password):
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT password FROM users WHERE emailid = %s", (self.email.data,))
+        user = cursor.fetchone()
+        cursor.close()
+        if user and not bcrypt.checkpw(password.data.encode('utf-8'), user[0].encode('utf-8')):
+            raise ValidationError('Invalid password')
 
 def send_email(to_email, subject, html_content):
     try:
@@ -40,9 +50,9 @@ def send_email(to_email, subject, html_content):
             server.login(os.getenv('SMTP_EMAIL'), os.getenv('SMTP_PASSWORD'))
             server.sendmail(os.getenv('SMTP_EMAIL'), to_email, msg.as_string())
 
-        print(f"✅ Email sent to {to_email}")
+        print(f"Email sent to {to_email}")
     except Exception as e:
-        print(f"❌ Email sending failed to {to_email}: {e}")
+        print(f"Email sending failed to {to_email}: {e}")
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -52,12 +62,4 @@ def login():
         password = form.password.data
 
         cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM users WHERE emailid = %s", (email,))
-        user = cursor.fetchone()
-        cursor.close()
-
-        if user and bcrypt.checkpw(password.encode('utf-8'), user[3].encode('utf-8')):
-            session['id'] = user[0]
-            return redirect(url_for('dashboard'))
-        else:
-            flash("Login failed. Please check your email and password", "danger")
+        cursor
