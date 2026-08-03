@@ -11,6 +11,7 @@ from wtforms.validators import DataRequired, Email, ValidationError
 from flask_mysqldb import MySQL
 import MySQLdb
 import bcrypt
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -20,6 +21,7 @@ app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
 app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
 mysql = MySQL(app)
+bcrypt = Bcrypt(app)
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
@@ -40,9 +42,9 @@ def send_email(to_email, subject, html_content):
             server.login(os.getenv('SMTP_EMAIL'), os.getenv('SMTP_PASSWORD'))
             server.sendmail(os.getenv('SMTP_EMAIL'), to_email, msg.as_string())
 
-        print(f"✅ Email sent to {to_email}")
+        print(f"Email sent to {to_email}")
     except Exception as e:
-        print(f"❌ Email sending failed to {to_email}: {e}")
+        print(f"Email sending failed to {to_email}: {e}")
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -60,4 +62,4 @@ def login():
             session['id'] = user[0]
             return redirect(url_for('dashboard'))
         else:
-            flash("Login failed. Please check your email and password", "danger")
+            flash("Login failed. Please
