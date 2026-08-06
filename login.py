@@ -11,6 +11,7 @@ from wtforms.validators import DataRequired, Email, ValidationError
 from flask_mysqldb import MySQL
 import MySQLdb
 import bcrypt
+import logging
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -40,9 +41,9 @@ def send_email(to_email, subject, html_content):
             server.login(os.getenv('SMTP_EMAIL'), os.getenv('SMTP_PASSWORD'))
             server.sendmail(os.getenv('SMTP_EMAIL'), to_email, msg.as_string())
 
-        print(f"✅ Email sent to {to_email}")
+        logging.info(f"Email sent to {to_email}")
     except Exception as e:
-        print(f"❌ Email sending failed to {to_email}: {e}")
+        logging.error(f"Email sending failed to {to_email}: {e}")
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
