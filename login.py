@@ -7,10 +7,11 @@ from email.mime.text import MIMEText
 from flask import Flask, render_template, redirect, url_for, session, flash, request
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, ValidationError
+from wtforms.validators import DataRequired, Email, ValidationError, Length
 from flask_mysqldb import MySQL
 import MySQLdb
 import bcrypt
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -20,10 +21,11 @@ app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
 app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
 mysql = MySQL(app)
+bcrypt = Bcrypt(app)
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
     submit = SubmitField("Login")
 
 def send_email(to_email, subject, html_content):
@@ -40,9 +42,9 @@ def send_email(to_email, subject, html_content):
             server.login(os.getenv('SMTP_EMAIL'), os.getenv('SMTP_PASSWORD'))
             server.sendmail(os.getenv('SMTP_EMAIL'), to_email, msg.as_string())
 
-        print(f"✅ Email sent to {to_email}")
+        print(f"Email sent to {to_email}")
     except Exception as e:
-        print(f"❌ Email sending failed to {to_email}: {e}")
+        print(f"Email sending failed to {to_email}: {e}")
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -60,4 +62,3 @@ def login():
             session['id'] = user[0]
             return redirect(url_for('dashboard'))
         else:
-            flash("Login failed. Please check your email and password", "danger")
